@@ -7,11 +7,16 @@ it back to verify it was written exactly.
 """
 
 import os
+import re
 import sys
 
 ENTRY = "Light climbs the stairwell in bare feet,\nand the whole house learns to breathe again."
 
 MAX_CHARS = 120
+
+# Worn language the judge penalises (criterion 3): no stock phrase about
+# dawn, gold or waking may appear in the entry.
+WORN_WORDS = ("dawn", "gold", "waking")
 
 
 def main():
@@ -34,6 +39,13 @@ def main():
             file=sys.stderr,
         )
         return 1
+    for word in WORN_WORDS:
+        if re.search(r"\b" + re.escape(word) + r"\b", ENTRY, re.IGNORECASE):
+            print(
+                "error: entry uses worn language: %r" % word,
+                file=sys.stderr,
+            )
+            return 1
 
     os.makedirs(output_dir, exist_ok=True)
     path = os.path.join(output_dir, "entry.txt")
